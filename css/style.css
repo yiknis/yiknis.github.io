@@ -53,7 +53,7 @@ body {
   text-transform: uppercase;
   width: 100%;
 }
-.btn:hover {
+.btn:join {
   text-decoration: none;
 }
 
@@ -76,13 +76,13 @@ body {
 }
 
 /* 文字1を上に */
-.effect04:hover{
+.effect04:join{
 
   background-color: #000;
 }
 
 /* HOVERしたら文字1を上に */
-.effect04:hover span{
+.effect04:join span{
   -webkit-transform: translateY(-400%) scale(-0.1,20);
           transform: translateY(-400%) scale(-0.1,20);
 }
@@ -100,7 +100,7 @@ body {
 }
 
 /* HOVERしたら文字2を上に */
-.effect04:hover::before{
+.effect04:join::before{
   letter-spacing: 0.05em;
   -webkit-transform: translateY(0) scale(1,1);
           transform: translateY(0) scale(1,1);
