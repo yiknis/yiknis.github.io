@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>曼茶罗</title>
+	<style>
+	@import url("https://fonts.googleapis.com/css?family=Open+Sans");
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+}
+body .dg.ac {
+  transition: opacity .35s;
+}
+body canvas {
+  cursor: default;
+}
+body canvas:active ~ .dg.ac {
+  opacity: .1;
+  pointer-events: none;
+}
+body li, body .close-button {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+	</style>
+</head>
+
+<body>
+	<script src="gui.js"></script>
+	<canvas id="c"></canvas>
+</body>
+	<script>
+	var c = document.getElementById('c'),
+    ctx = c.getContext('2d'),
+    dots = [],
+    drawing = false,
+    circlePath,
+    cx, cy, r, angle, _2PI = 2 * Math.PI,
+    s = {
+        'sectors': 10,
+        'line width': 3,
+        'color': '#00d1ff',
+        'clear': function() {
+            resize();
+        }
+    };
+
+function resize() {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    cx = c.width / 2;
+    cy = c.height / 2;
+    r = Math.min(cx, cy) - 10;
+    angle = _2PI / s.sectors;
+    drawSectors();
+    dots = [];
+    ctx.translate(cx, cy);
+}
+resize();
+window.addEventListener("resize", resize);
+
+var gui = new dat.GUI();
+gui.add(s, "sectors", 2, 20, 1).onChange(resize);
+gui.add(s, "line width", 1, 10, 1);
+gui.addColor(s, "color");
+gui.add(s, "clear");
+
+function drawSectors() {
+    for (var i = 0; i < _2PI; i += angle) {
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 255, 255, .15)';
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, i, i + angle);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+    }
+}
+
+function Dot(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+function d(x1, y1, x2, y2) {
+    return Math.sqrt(
+        Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)
+    );
+}
+
+function draw(e) {
+    if (drawing) {
+        var x = e.touches ? e.touches[0].clientX : e.clientX,
+            y = e.touches ? e.touches[0].clientY : e.clientY;
+
+        x -= c.offsetLeft;
+        y -= c.offsetTop;
+
+        if (d(x, y, cx, cy) < r) {
+            dots.push(new Dot(x - cx, y - cy));
+            drawLines();
+        } else {
+            drawing = false;
+            dots = [];
+        }
+    }
+}
+
+c.addEventListener('mousedown', function() {
+    drawing = true;
+});
+
+c.addEventListener('touchstart', function() {
+    drawing = true;
+});
+
+c.addEventListener('mousemove', draw);
+c.addEventListener('touchmove', draw);
+
+c.addEventListener('mouseup', function() {
+    drawing = false;
+    dots = [];
+});
+
+c.addEventListener('touchend', function() {
+    drawing = false;
+    dots = [];
+});
+
+function drawLines() {
+    ctx.lineWidth = s['line width'];
+    ctx.lineCap = 'round';
+
+    for (var i = 0; i < _2PI; i += angle) {
+        ctx.rotate(angle);
+        for (var j = 0; j < dots.length - 1; j++) {
+            ctx.strokeStyle = s.color;
+            ctx.beginPath();
+            ctx.moveTo(dots[j].x, dots[j].y);
+            ctx.lineTo(dots[j + 1].x, dots[j + 1].y);
+            ctx.stroke();
+        }
+    }
+}
+	</script>
+</html>
